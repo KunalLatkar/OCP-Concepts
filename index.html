@@ -1,0 +1,2039 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OpenShift Learning Hub</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="logo">
+                <i class="fas fa-cube"></i>
+                <span>OpenShift</span>
+            </div>
+            <button class="theme-toggle" id="themeToggle">
+                <i class="fas fa-moon"></i>
+            </button>
+        </div>
+    </nav>
+
+    <aside class="sidebar">
+        <div class="sidebar-content">
+            <h3>Topics</h3>
+            <ul class="nav-links">
+                <li><a href="#architecture" class="nav-link"><i class="fas fa-project-diagram"></i> Architecture</a></li>
+                <li><a href="#oc-command" class="nav-link"><i class="fas fa-terminal"></i> OC Command Flow</a></li>
+                <li><a href="#configmap" class="nav-link"><i class="fas fa-cog"></i> ConfigMap</a></li>
+                <li><a href="#secrets" class="nav-link"><i class="fas fa-key"></i> Secrets</a></li>
+                <li><a href="#resource-quotas" class="nav-link"><i class="fas fa-chart-pie"></i> Resource Quotas</a></li>
+                <li><a href="#limit-ranges" class="nav-link"><i class="fas fa-ruler"></i> Limit Ranges</a></li>
+                <li><a href="#scc" class="nav-link"><i class="fas fa-shield-alt"></i> SCC</a></li>
+                <li><a href="#network-policy" class="nav-link"><i class="fas fa-network-wired"></i> Network Policy</a></li>
+                <li><a href="#service-accounts" class="nav-link"><i class="fas fa-user-shield"></i> Service Accounts</a></li>
+                <li><a href="#networking" class="nav-link"><i class="fas fa-sitemap"></i> Networking</a></li>
+                <li><a href="#hcp" class="nav-link"><i class="fas fa-cloud"></i> HCP</a></li>
+                <li><a href="#acm" class="nav-link"><i class="fas fa-globe"></i> ACM</a></li>
+                <li><a href="#olm" class="nav-link"><i class="fas fa-box"></i> OLM</a></li>
+                <li><a href="#cvo" class="nav-link"><i class="fas fa-sync-alt"></i> CVO</a></li>
+                <li><a href="#machine-config" class="nav-link"><i class="fas fa-server"></i> Machine Config</a></li>
+                <li><a href="#virtualization" class="nav-link"><i class="fas fa-desktop"></i> Virtualization</a></li>
+            </ul>
+        </div>
+    </aside>
+
+    <main class="main-content">
+        <section class="hero">
+            <h1>OpenShift Learning Hub</h1>
+            <p>Master OpenShift concepts with detailed explanations and examples</p>
+        </section>
+
+        <!-- IMPORTANT: Edit image paths in config.js file -->
+
+        <section id="architecture" class="content-section">
+            <h2><i class="fas fa-project-diagram"></i> OpenShift Architecture</h2>
+            <p>OpenShift is built on Kubernetes and provides additional enterprise features. The architecture consists of master nodes (control plane) and worker nodes.</p>
+
+            <div class="info-box">
+                <h4>Key Components:</h4>
+                <ul>
+                    <li><strong>Control Plane:</strong> API Server, Controller Manager, Scheduler, etcd</li>
+                    <li><strong>Worker Nodes:</strong> Kubelet, Container Runtime (CRI-O), Kube-proxy</li>
+                    <li><strong>OpenShift Components:</strong> OAuth server, Image Registry, Router (HAProxy)</li>
+                    <li><strong>Operators:</strong> Automated application management (OLM, CVO, MCO)</li>
+                </ul>
+            </div>
+
+            <div class="info-box">
+                <h4>Control Plane Responsibilities:</h4>
+                <ul>
+                    <li><strong>API Server:</strong> Central management point, validates and processes API requests</li>
+                    <li><strong>etcd:</strong> Distributed key-value store for cluster state</li>
+                    <li><strong>Controller Manager:</strong> Watches cluster state and makes changes to match desired state</li>
+                    <li><strong>Scheduler:</strong> Assigns pods to nodes based on resource requirements</li>
+                </ul>
+            </div>
+        </section>
+
+        <section id="oc-command" class="content-section">
+            <h2><i class="fas fa-terminal"></i> How OC Command Works</h2>
+            <p>The OpenShift CLI (oc) communicates with the cluster through the API server. Understanding this flow is crucial for troubleshooting and automation.</p>
+
+            <!-- Image Path: Update in config.js -->
+            <div class="diagram-container">
+                <img src="images/oc-command-flow.png" alt="OC Command Architecture" class="diagram-image">
+                <p class="image-caption">How OC commands flow through the OpenShift cluster</p>
+            </div>
+
+            <div class="info-box">
+                <h4>Command Flow Process:</h4>
+                <ol>
+                    <li><strong>User Issues Command:</strong> User executes an <code>oc</code> command (e.g., <code>oc create pod</code>)</li>
+                    <li><strong>API Server:</strong> Request sent to API server which authenticates and validates the request</li>
+                    <li><strong>etcd Update:</strong> API server writes the desired state to etcd</li>
+                    <li><strong>Controller Manager:</strong> Watches etcd for changes and reconciles actual state with desired state</li>
+                    <li><strong>Scheduler:</strong> Selects appropriate node for pod placement based on resources and constraints</li>
+                    <li><strong>Kubelet:</strong> Node agent executes the workload via container runtime (CRI-O)</li>
+                    <li><strong>Status Updates:</strong> Kubelet reports status back to API server, which updates etcd</li>
+                </ol>
+            </div>
+
+            <div class="code-block">
+                <div class="code-header">
+                    <span>Common OC Commands</span>
+                    <button class="copy-btn" onclick="copyCode(this)"><i class="fas fa-copy"></i></button>
+                </div>
+                <pre><code># Login to cluster
+oc login https://api.cluster.example.com:6443
+
+# Get current project
+oc project
+
+# List resources
+oc get pods
+oc get deployments
+oc get services
+oc get routes
+
+# Describe resource for detailed info
+oc describe pod <pod-name>
+
+# View logs
+oc logs <pod-name>
+oc logs -f <pod-name>  # Follow logs
+
+# Execute command in pod
+oc exec -it <pod-name> -- /bin/bash
+
+# Port forwarding
+oc port-forward <pod-name> 8080:8080
+
+# Create resources
+oc create -f resource.yaml
+oc apply -f resource.yaml
+
+# Edit resource
+oc edit deployment <deployment-name>
+
+# Delete resources
+oc delete pod <pod-name>
+oc delete -f resource.yaml</code></pre>
+            </div>
+        </section>
+
+        <section id="configmap" class="content-section">
+            <h2><i class="fas fa-cog"></i> ConfigMap</h2>
+            <p>ConfigMaps allow you to decouple configuration artifacts from image content to keep containerized applications portable. They store non-confidential data in key-value pairs.</p>
+
+            <div class="info-box">
+                <h4>Use Cases:</h4>
+                <ul>
+                    <li>Store environment-specific configuration (dev, staging, prod)</li>
+                    <li>Configure application settings without rebuilding images</li>
+                    <li>Inject configuration files into pods as volumes</li>
+                    <li>Set environment variables from configuration data</li>
+                </ul>
+            </div>
+
+            <div class="code-block">
+                <div class="code-header">
+                    <span>configmap.yaml</span>
+                    <button class="copy-btn" onclick="copyCode(this)"><i class="fas fa-copy"></i></button>
+                </div>
+                <pre><code>apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: app-config
+  namespace: default
+data:
+  # Property-like keys
+  database.host: "mysql-service.default.svc.cluster.local"
+  database.port: "3306"
+  log.level: "INFO"
+  app.environment: "production"
+
+  # File-like keys
+  app.properties: |
+    app.name=MyApplication
+    app.version=1.0.0
+    app.feature.enabled=true
+    app.max.connections=100
+
+  config.json: |
+    {
+      "server": {
+        "port": 8080,
+        "host": "0.0.0.0"
+      },
+      "timeout": 30,
+      "retries": 3
+    }</code></pre>
+            </div>
+
+            <div class="code-block">
+                <div class="code-header">
+                    <span>Using ConfigMap in Pod</span>
+                    <button class="copy-btn" onclick="copyCode(this)"><i class="fas fa-copy"></i></button>
+                </div>
+                <pre><code>apiVersion: v1
+kind: Pod
+metadata:
+  name: app-pod
+spec:
+  containers:
+  - name: app
+    image: myapp:1.0
+
+    # Method 1: Environment variables from ConfigMap
+    env:
+    - name: DATABASE_HOST
+      valueFrom:
+        configMapKeyRef:
+          name: app-config
+          key: database.host
+    - name: LOG_LEVEL
+      valueFrom:
+        configMapKeyRef:
+          name: app-config
+          key: log.level
+
+    # Method 2: All keys as environment variables
+    envFrom:
+    - configMapRef:
+        name: app-config
+
+    # Method 3: Mount as volume
+    volumeMounts:
+    - name: config-volume
+      mountPath: /etc/config
+      readOnly: true
+
+  volumes:
+  - name: config-volume
+    configMap:
+      name: app-config
+      items:
+      - key: config.json
+        path: config.json</code></pre>
+            </div>
+
+            <div class="code-block">
+                <div class="code-header">
+                    <span>ConfigMap Commands</span>
+                    <button class="copy-btn" onclick="copyCode(this)"><i class="fas fa-copy"></i></button>
+                </div>
+                <pre><code># Create from literal values
+oc create configmap app-config \
+  --from-literal=database.host=mysql \
+  --from-literal=database.port=3306
+
+# Create from file
+oc create configmap app-config \
+  --from-file=config.json
+
+# Create from directory
+oc create configmap app-config \
+  --from-file=configs/
+
+# View ConfigMap
+oc get configmap app-config -o yaml
+
+# Edit ConfigMap
+oc edit configmap app-config
+
+# Delete ConfigMap
+oc delete configmap app-config</code></pre>
+            </div>
+        </section>
+
+        <section id="secrets" class="content-section">
+            <h2><i class="fas fa-key"></i> Secrets</h2>
+            <p>Secrets are similar to ConfigMaps but are specifically designed to hold confidential data. Data is base64-encoded and can be encrypted at rest in etcd.</p>
+
+            <div class="warning-box">
+                <i class="fas fa-exclamation-triangle"></i>
+                <div>
+                    <strong>Security Note:</strong> Base64 encoding is NOT encryption - it's just encoding. Always enable encryption at rest for production clusters and use RBAC to restrict secret access.
+                </div>
+            </div>
+
+            <div class="info-box">
+                <h4>Secret Types:</h4>
+                <ul>
+                    <li><strong>Opaque:</strong> Generic secret type for arbitrary user-defined data</li>
+                    <li><strong>kubernetes.io/tls:</strong> TLS certificate and key pairs</li>
+                    <li><strong>kubernetes.io/dockerconfigjson:</strong> Docker registry credentials</li>
+                    <li><strong>kubernetes.io/basic-auth:</strong> Basic authentication credentials</li>
+                    <li><strong>kubernetes.io/ssh-auth:</strong> SSH authentication credentials</li>
+                    <li><strong>kubernetes.io/service-account-token:</strong> Service account tokens</li>
+                </ul>
+            </div>
+
+            <div class="code-block">
+                <div class="code-header">
+                    <span>secret.yaml</span>
+                    <button class="copy-btn" onclick="copyCode(this)"><i class="fas fa-copy"></i></button>
+                </div>
+                <pre><code>apiVersion: v1
+kind: Secret
+metadata:
+  name: db-credentials
+  namespace: default
+type: Opaque
+data:
+  # Base64 encoded values: echo -n 'admin' | base64
+  username: YWRtaW4=
+  password: cGFzc3dvcmQxMjM=
+
+stringData:
+  # Plain text - will be automatically base64 encoded
+  database-url: "postgresql://admin:password123@db.example.com:5432/mydb"
+
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: tls-secret
+type: kubernetes.io/tls
+data:
+  tls.crt: LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0t...
+  tls.key: LS0tLS1CRUdJTiBQUklWQVRFIEtFWS0tLS0t...
+
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: registry-secret
+type: kubernetes.io/dockerconfigjson
+data:
+  .dockerconfigjson: eyJhdXRocyI6eyJxdWF5LmlvIjp7ImF1dGgiOi4uLg==</code></pre>
+            </div>
+
+            <div class="code-block">
+                <div class="code-header">
+                    <span>Using Secret in Pod</span>
+                    <button class="copy-btn" onclick="copyCode(this)"><i class="fas fa-copy"></i></button>
+                </div>
+                <pre><code>apiVersion: v1
+kind: Pod
+metadata:
+  name: secret-pod
+spec:
+  containers:
+  - name: app
+    image: myapp:1.0
+
+    # Environment variables from secret
+    env:
+    - name: DB_USERNAME
+      valueFrom:
+        secretKeyRef:
+          name: db-credentials
+          key: username
+    - name: DB_PASSWORD
+      valueFrom:
+        secretKeyRef:
+          name: db-credentials
+          key: password
+
+    # Mount secret as volume
+    volumeMounts:
+    - name: secret-volume
+      mountPath: /etc/secrets
+      readOnly: true
+
+  # Use image pull secret
+  imagePullSecrets:
+  - name: registry-secret
+
+  volumes:
+  - name: secret-volume
+    secret:
+      secretName: db-credentials
+      defaultMode: 0400  # Read-only for owner</code></pre>
+            </div>
+
+            <div class="code-block">
+                <div class="code-header">
+                    <span>Secret Commands</span>
+                    <button class="copy-btn" onclick="copyCode(this)"><i class="fas fa-copy"></i></button>
+                </div>
+                <pre><code># Create from literal values
+oc create secret generic db-secret \
+  --from-literal=username=admin \
+  --from-literal=password=secret123
+
+# Create from files
+oc create secret generic ssh-secret \
+  --from-file=ssh-privatekey=~/.ssh/id_rsa \
+  --from-file=ssh-publickey=~/.ssh/id_rsa.pub
+
+# Create TLS secret
+oc create secret tls tls-secret \
+  --cert=path/to/tls.crt \
+  --key=path/to/tls.key
+
+# Create docker registry secret
+oc create secret docker-registry registry-secret \
+  --docker-server=quay.io \
+  --docker-username=user \
+  --docker-password=pass \
+  --docker-email=user@example.com
+
+# Decode secret value
+oc get secret db-credentials -o jsonpath='{.data.password}' | base64 -d
+
+# View secret (values are hidden)
+oc get secret db-credentials -o yaml</code></pre>
+            </div>
+        </section>
+
+        <section id="resource-quotas" class="content-section">
+            <h2><i class="fas fa-chart-pie"></i> Resource Quotas</h2>
+            <p>Resource Quotas provide constraints that limit aggregate resource consumption per namespace. They prevent resource starvation and ensure fair resource distribution across teams and projects.</p>
+
+            <div class="info-box">
+                <h4>What Can Be Limited:</h4>
+                <ul>
+                    <li><strong>Compute Resources:</strong> CPU requests/limits, memory requests/limits</li>
+                    <li><strong>Storage Resources:</strong> PersistentVolumeClaims, storage requests per storage class</li>
+                    <li><strong>Object Counts:</strong> pods, services, secrets, configmaps, routes, etc.</li>
+                    <li><strong>Extended Resources:</strong> GPUs, custom resources</li>
+                </ul>
+            </div>
+
+            <div class="code-block">
+                <div class="code-header">
+                    <span>resourcequota.yaml</span>
+                    <button class="copy-btn" onclick="copyCode(this)"><i class="fas fa-copy"></i></button>
+                </div>
+                <pre><code>apiVersion: v1
+kind: ResourceQuota
+metadata:
+  name: compute-quota
+  namespace: development
+spec:
+  hard:
+    # Compute resources
+    requests.cpu: "10"
+    requests.memory: 20Gi
+    limits.cpu: "20"
+    limits.memory: 40Gi
+
+    # Storage
+    requests.storage: 100Gi
+    persistentvolumeclaims: "10"
+
+    # Object counts
+    pods: "50"
+    services: "20"
+    secrets: "50"
+    configmaps: "50"
+    replicationcontrollers: "20"
+
+---
+apiVersion: v1
+kind: ResourceQuota
+metadata:
+  name: storage-quota
+  namespace: development
+spec:
+  hard:
+    # Limit storage by storage class
+    gold.storageclass.storage.k8s.io/requests.storage: 20Gi
+    gold.storageclass.storage.k8s.io/persistentvolumeclaims: "5"
+    silver.storageclass.storage.k8s.io/requests.storage: 50Gi
+    silver.storageclass.storage.k8s.io/persistentvolumeclaims: "10"</code></pre>
+            </div>
+
+            <div class="code-block">
+                <div class="code-header">
+                    <span>Quota Usage Commands</span>
+                    <button class="copy-btn" onclick="copyCode(this)"><i class="fas fa-copy"></i></button>
+                </div>
+                <pre><code># List resource quotas
+oc get resourcequota -n development
+
+# Describe quota to see usage
+oc describe resourcequota compute-quota -n development
+
+# Example output:
+# Name:       compute-quota
+# Resource    Used   Hard
+# --------    ----   ----
+# limits.cpu  5      20
+# limits.memory  10Gi   40Gi
+# pods        15     50
+
+# Create quota
+oc create quota compute-quota \
+  --hard=requests.cpu=10,requests.memory=20Gi \
+  -n development</code></pre>
+            </div>
+        </section>
+
+        <section id="limit-ranges" class="content-section">
+            <h2><i class="fas fa-ruler"></i> Limit Ranges</h2>
+            <p>LimitRange sets default resource requests and limits for pods and containers in a namespace, and enforces min/max constraints. They complement Resource Quotas by setting per-pod/container limits.</p>
+
+            <div class="info-box">
+                <h4>Key Features:</h4>
+                <ul>
+                    <li>Set default requests and limits for containers without resource specs</li>
+                    <li>Enforce minimum and maximum resource constraints</li>
+                    <li>Limit storage requests for PersistentVolumeClaims</li>
+                    <li>Set default request-to-limit ratios (maxLimitRequestRatio)</li>
+                </ul>
+            </div>
+
+            <div class="info-box">
+                <h4>Difference Between Resource Quotas and Limit Ranges:</h4>
+                <ul>
+                    <li><strong>Resource Quotas:</strong> Namespace-level aggregate limits (total resources for all pods)</li>
+                    <li><strong>Limit Ranges:</strong> Per-pod/container limits and defaults</li>
+                </ul>
+            </div>
+
+            <div class="code-block">
+                <div class="code-header">
+                    <span>limitrange.yaml</span>
+                    <button class="copy-btn" onclick="copyCode(this)"><i class="fas fa-copy"></i></button>
+                </div>
+                <pre><code>apiVersion: v1
+kind: LimitRange
+metadata:
+  name: resource-limits
+  namespace: development
+spec:
+  limits:
+  # Container limits
+  - type: Container
+    max:
+      cpu: "2"
+      memory: 4Gi
+    min:
+      cpu: 100m
+      memory: 128Mi
+    default:  # Default limits if not specified
+      cpu: 500m
+      memory: 512Mi
+    defaultRequest:  # Default requests if not specified
+      cpu: 200m
+      memory: 256Mi
+    maxLimitRequestRatio:  # Limit cannot be more than 4x request
+      cpu: 4
+      memory: 2
+
+  # Pod limits (sum of all containers in pod)
+  - type: Pod
+    max:
+      cpu: "4"
+      memory: 8Gi
+    min:
+      cpu: 200m
+      memory: 256Mi
+
+  # PVC limits
+  - type: PersistentVolumeClaim
+    max:
+      storage: 50Gi
+    min:
+      storage: 1Gi</code></pre>
+            </div>
+
+            <div class="code-block">
+                <div class="code-header">
+                    <span>Pod Without Resources (Gets Defaults)</span>
+                    <button class="copy-btn" onclick="copyCode(this)"><i class="fas fa-copy"></i></button>
+                </div>
+                <pre><code>apiVersion: v1
+kind: Pod
+metadata:
+  name: default-resources-pod
+  namespace: development
+spec:
+  containers:
+  - name: app
+    image: nginx:latest
+    # No resources specified here
+    # LimitRange automatically applies:
+    # requests:
+    #   cpu: 200m
+    #   memory: 256Mi
+    # limits:
+    #   cpu: 500m
+    #   memory: 512Mi</code></pre>
+            </div>
+        </section>
+
+        <section id="scc" class="content-section">
+            <h2><i class="fas fa-shield-alt"></i> Security Context Constraints (SCC)</h2>
+            <p>SCCs are an OpenShift-specific resource that control the actions pods can perform and what resources they can access. They define a set of security conditions that a pod must run with to be accepted into the system.</p>
+
+            <div class="warning-box">
+                <i class="fas fa-exclamation-triangle"></i>
+                <div>
+                    <strong>Security Best Practice:</strong> Always use the most restrictive SCC possible for your workload. Avoid using privileged SCC in production unless absolutely necessary.
+                </div>
+            </div>
+
+            <div class="info-box">
+                <h4>Default SCCs (Most to Least Restrictive):</h4>
+                <ol>
+                    <li><strong>restricted:</strong> Most restrictive, denies access to all host features</li>
+                    <li><strong>restricted-v2:</strong> Similar to restricted with additional restrictions</li>
+                    <li><strong>nonroot:</strong> Similar to restricted but allows non-root UIDs</li>
+                    <li><strong>nonroot-v2:</strong> Enhanced nonroot with stricter controls</li>
+                    <li><strong>anyuid:</strong> Allows running as any UID (including root)</li>
+                    <li><strong>hostmount-anyuid:</strong> Allows host mounts and any UID</li>
+                    <li><strong>hostnetwork:</strong> Allows host network access</li>
+                    <li><strong>hostaccess:</strong> Allows host access including networking, IPC, PID</li>
+                    <li><strong>privileged:</strong> Least restrictive, allows everything including privileged containers</li>
+                </ol>
+            </div>
+
+            <div class="code-block">
+                <div class="code-header">
+                    <span>custom-scc.yaml</span>
+                    <button class="copy-btn" onclick="copyCode(this)"><i class="fas fa-copy"></i></button>
+                </div>
+                <pre><code>apiVersion: security.openshift.io/v1
+kind: SecurityContextConstraints
+metadata:
+  name: custom-scc
+allowPrivilegedContainer: false
+allowPrivilegeEscalation: false
+allowHostDirVolumePlugin: false
+allowHostNetwork: false
+allowHostPorts: false
+allowHostPID: false
+allowHostIPC: false
+readOnlyRootFilesystem: false
+
+# Capabilities
+requiredDropCapabilities:
+- KILL
+- MKNOD
+- SETUID
+- SETGID
+allowedCapabilities:
+- NET_BIND_SERVICE  # Allow binding to ports < 1024
+
+# User/Group constraints
+runAsUser:
+  type: MustRunAsRange
+  uidRangeMin: 1000
+  uidRangeMax: 65535
+seLinuxContext:
+  type: MustRunAs
+fsGroup:
+  type: RunAsAny
+supplementalGroups:
+  type: RunAsAny
+
+# Allowed volumes
+volumes:
+- configMap
+- downwardAPI
+- emptyDir
+- persistentVolumeClaim
+- projected
+- secret
+
+# Who can use this SCC
+users:
+- system:serviceaccount:myproject:myserviceaccount
+groups:
+- system:authenticated</code></pre>
+            </div>
+
+            <div class="code-block">
+                <div class="code-header">
+                    <span>SCC Management Commands</span>
+                    <button class="copy-btn" onclick="copyCode(this)"><i class="fas fa-copy"></i></button>
+                </div>
+                <pre><code># List all SCCs
+oc get scc
+
+# View specific SCC
+oc describe scc restricted
+
+# Add SCC to service account
+oc adm policy add-scc-to-user anyuid -z myserviceaccount -n myproject
+
+# Add SCC to all service accounts in namespace
+oc adm policy add-scc-to-user anyuid system:serviceaccount:myproject
+
+# Add SCC to group
+oc adm policy add-scc-to-group anyuid system:authenticated
+
+# Check which SCC a pod is using
+oc get pod <pod-name> -o yaml | grep scc
+
+# Check which SCC a service account can use
+oc describe scc | grep -A 10 <serviceaccount-name>
+
+# Remove SCC from service account
+oc adm policy remove-scc-from-user anyuid -z myserviceaccount -n myproject</code></pre>
+            </div>
+
+            <div class="code-block">
+                <div class="code-header">
+                    <span>Pod Using Custom SCC</span>
+                    <button class="copy-btn" onclick="copyCode(this)"><i class="fas fa-copy"></i></button>
+                </div>
+                <pre><code>apiVersion: v1
+kind: Pod
+metadata:
+  name: scc-pod
+  namespace: myproject
+spec:
+  serviceAccountName: myserviceaccount
+  securityContext:
+    runAsUser: 1000
+    runAsNonRoot: true
+    fsGroup: 2000
+    seccompProfile:
+      type: RuntimeDefault
+  containers:
+  - name: app
+    image: myapp:1.0
+    securityContext:
+      allowPrivilegeEscalation: false
+      capabilities:
+        drop:
+        - ALL
+        add:
+        - NET_BIND_SERVICE
+      runAsNonRoot: true
+      runAsUser: 1000</code></pre>
+            </div>
+        </section>
+
+        <section id="network-policy" class="content-section">
+            <h2><i class="fas fa-network-wired"></i> Network Policy</h2>
+            <p>NetworkPolicies are Kubernetes resources that control traffic flow between pods and network endpoints at the IP address or port level. They act as a firewall for pods, implementing microsegmentation within your cluster.</p>
+
+            <div class="info-box">
+                <h4>Key Concepts:</h4>
+                <ul>
+                    <li><strong>Default Behavior:</strong> Without NetworkPolicy, all pods can communicate with each other</li>
+                    <li><strong>Deny by Default:</strong> Once a NetworkPolicy selects a pod, it denies all traffic except what's explicitly allowed</li>
+                    <li><strong>Additive:</strong> Multiple NetworkPolicies are combined - union of all allowed traffic</li>
+                    <li><strong>Namespaced:</strong> NetworkPolicies apply to pods in their namespace</li>
+                </ul>
+            </div>
+
+            <div class="info-box">
+                <h4>Types of Network Policies:</h4>
+                <ul>
+                    <li><strong>NetworkPolicy:</strong> Namespace-scoped policies for specific pods</li>
+                    <li><strong>AdminNetworkPolicy:</strong> Cluster-scoped policies with higher priority (OpenShift 4.14+)</li>
+                    <li><strong>Priority:</strong> AdminNetworkPolicy > NetworkPolicy</li>
+                </ul>
+            </div>
+
+            <div class="code-block">
+                <div class="code-header">
+                    <span>networkpolicy.yaml</span>
+                    <button class="copy-btn" onclick="copyCode(this)"><i class="fas fa-copy"></i></button>
+                </div>
+                <pre><code>apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-from-frontend
+  namespace: backend
+spec:
+  # Apply to pods with these labels
+  podSelector:
+    matchLabels:
+      app: database
+      tier: backend
+
+  # Allow ingress and egress
+  policyTypes:
+  - Ingress
+  - Egress
+
+  # Ingress rules (incoming traffic)
+  ingress:
+  # Rule 1: Allow from frontend pods in same namespace
+  - from:
+    - podSelector:
+        matchLabels:
+          app: frontend
+    ports:
+    - protocol: TCP
+      port: 5432
+
+  # Rule 2: Allow from frontend namespace
+  - from:
+    - namespaceSelector:
+        matchLabels:
+          name: frontend
+    ports:
+    - protocol: TCP
+      port: 5432
+
+  # Rule 3: Allow from specific IP range
+  - from:
+    - ipBlock:
+        cidr: 10.0.0.0/24
+        except:
+        - 10.0.0.5/32
+    ports:
+    - protocol: TCP
+      port: 5432
+
+  # Egress rules (outgoing traffic)
+  egress:
+  # Allow DNS queries
+  - to:
+    - namespaceSelector:
+        matchLabels:
+          kubernetes.io/metadata.name: openshift-dns
+    ports:
+    - protocol: UDP
+      port: 53
+
+  # Allow external database
+  - to:
+    - ipBlock:
+        cidr: 192.168.1.0/24
+    ports:
+    - protocol: TCP
+      port: 3306
+
+---
+# Deny all ingress traffic
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: deny-all-ingress
+  namespace: production
+spec:
+  podSelector: {}  # Applies to all pods
+  policyTypes:
+  - Ingress
+  # No ingress rules = deny all
+
+---
+# Allow traffic only within same namespace
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-same-namespace
+  namespace: development
+spec:
+  podSelector: {}  # All pods
+  policyTypes:
+  - Ingress
+  ingress:
+  - from:
+    - podSelector: {}  # From any pod in same namespace
+
+---
+# Allow external traffic to web frontend
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: web-allow-external
+  namespace: web
+spec:
+  podSelector:
+    matchLabels:
+      app: web
+  policyTypes:
+  - Ingress
+  ingress:
+  - ports:  # No from clause = allow from anywhere
+    - protocol: TCP
+      port: 80
+    - protocol: TCP
+      port: 443</code></pre>
+            </div>
+
+            <div class="code-block">
+                <div class="code-header">
+                    <span>Network Policy Commands</span>
+                    <button class="copy-btn" onclick="copyCode(this)"><i class="fas fa-copy"></i></button>
+                </div>
+                <pre><code># List network policies
+oc get networkpolicy
+
+# Describe network policy
+oc describe networkpolicy allow-from-frontend
+
+# Test connectivity between pods
+oc run test-pod --image=busybox --rm -it -- sh
+# Inside pod: wget -O- http://backend-service:8080
+
+# View applied policies on a pod
+oc get pod <pod-name> -o yaml | grep -A 5 network
+
+# Delete network policy
+oc delete networkpolicy deny-all-ingress</code></pre>
+            </div>
+
+            <div class="info-box">
+                <h4>Service FQDN (Fully Qualified Domain Name):</h4>
+                <p>Services are accessible via DNS within the cluster using the format:</p>
+                <code>&lt;service-name&gt;.&lt;namespace&gt;.svc.cluster.local</code>
+                <ul>
+                    <li>Same namespace: <code>my-service</code> or <code>my-service:8080</code></li>
+                    <li>Different namespace: <code>my-service.other-namespace</code></li>
+                    <li>Full FQDN: <code>my-service.other-namespace.svc.cluster.local</code></li>
+                </ul>
+            </div>
+        </section>
+
+        <section id="service-accounts" class="content-section">
+            <h2><i class="fas fa-user-shield"></i> Service Accounts</h2>
+            <p>Service Accounts provide an identity for processes running in pods. They are used for authentication to the API server and for RBAC authorization, enabling pods to interact with the Kubernetes API securely.</p>
+
+            <div class="info-box">
+                <h4>Key Points:</h4>
+                <ul>
+                    <li>Every namespace has a <strong>default</strong> service account automatically created</li>
+                    <li>Pods automatically use the default SA if none is specified</li>
+                    <li>SA credentials are mounted as secrets in pods at <code>/var/run/secrets/kubernetes.io/serviceaccount/</code></li>
+                    <li>Use RBAC (Roles/RoleBindings) to grant permissions to service accounts</li>
+                    <li>Each SA gets a unique token for API authentication</li>
+                </ul>
+            </div>
+
+            <div class="code-block">
+                <div class="code-header">
+                    <span>serviceaccount.yaml</span>
+                    <button class="copy-btn" onclick="copyCode(this)"><i class="fas fa-copy"></i></button>
+                </div>
+                <pre><code>apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: app-service-account
+  namespace: myapp
+automountServiceAccountToken: true
+imagePullSecrets:
+- name: registry-secret
+secrets:
+- name: app-token-secret
+
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: app-token-secret
+  namespace: myapp
+  annotations:
+    kubernetes.io/service-account.name: app-service-account
+type: kubernetes.io/service-account-token</code></pre>
+            </div>
+
+            <div class="code-block">
+                <div class="code-header">
+                    <span>RBAC for Service Account</span>
+                    <button class="copy-btn" onclick="copyCode(this)"><i class="fas fa-copy"></i></button>
+                </div>
+                <pre><code># Role: Namespace-scoped permissions
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: pod-reader
+  namespace: myapp
+rules:
+- apiGroups: [""]
+  resources: ["pods"]
+  verbs: ["get", "list", "watch"]
+- apiGroups: [""]
+  resources: ["pods/log"]
+  verbs: ["get"]
+
+---
+# RoleBinding: Grants Role to ServiceAccount
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: read-pods
+  namespace: myapp
+subjects:
+- kind: ServiceAccount
+  name: app-service-account
+  namespace: myapp
+roleRef:
+  kind: Role
+  name: pod-reader
+  apiGroup: rbac.authorization.k8s.io
+
+---
+# ClusterRole: Cluster-wide permissions
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: node-reader
+rules:
+- apiGroups: [""]
+  resources: ["nodes"]
+  verbs: ["get", "list"]
+- apiGroups: [""]
+  resources: ["namespaces"]
+  verbs: ["get", "list"]
+
+---
+# ClusterRoleBinding: Grants ClusterRole to ServiceAccount
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: read-nodes-global
+subjects:
+- kind: ServiceAccount
+  name: app-service-account
+  namespace: myapp
+roleRef:
+  kind: ClusterRole
+  name: node-reader
+  apiGroup: rbac.authorization.k8s.io</code></pre>
+            </div>
+
+            <div class="code-block">
+                <div class="code-header">
+                    <span>Using Service Account in Pod</span>
+                    <button class="copy-btn" onclick="copyCode(this)"><i class="fas fa-copy"></i></button>
+                </div>
+                <pre><code>apiVersion: v1
+kind: Pod
+metadata:
+  name: sa-pod
+  namespace: myapp
+spec:
+  serviceAccountName: app-service-account
+  automountServiceAccountToken: true
+  containers:
+  - name: app
+    image: myapp:1.0
+    # Service account token automatically mounted at:
+    # /var/run/secrets/kubernetes.io/serviceaccount/
+    #   - token (JWT token)
+    #   - ca.crt (CA certificate)
+    #   - namespace (current namespace)
+
+    # Application can use token to call Kubernetes API
+    command:
+    - sh
+    - -c
+    - |
+      TOKEN=$(cat /var/run/secrets/kubernetes.io/serviceaccount/token)
+      curl -k -H "Authorization: Bearer $TOKEN" \
+        https://kubernetes.default.svc/api/v1/namespaces/myapp/pods</code></pre>
+            </div>
+
+            <div class="code-block">
+                <div class="code-header">
+                    <span>Service Account Commands</span>
+                    <button class="copy-btn" onclick="copyCode(this)"><i class="fas fa-copy"></i></button>
+                </div>
+                <pre><code># Create service account
+oc create sa myserviceaccount -n myapp
+
+# Get service accounts
+oc get sa -n myapp
+
+# Describe service account
+oc describe sa app-service-account -n myapp
+
+# Get token for service account (legacy)
+oc sa get-token app-service-account -n myapp
+
+# Create bound token with expiration (recommended)
+oc create token app-service-account --duration=1h -n myapp
+
+# Link secret to service account (for image pull)
+oc secrets link app-service-account registry-secret --for=pull
+
+# Link secret to service account (for mount)
+oc secrets link app-service-account app-secret --for=mount
+
+# Grant permissions using oc adm policy
+oc adm policy add-role-to-user view \
+  system:serviceaccount:myapp:app-service-account -n myapp
+
+# Who can perform action
+oc adm policy who-can get pods -n myapp</code></pre>
+            </div>
+        </section>
+
+        <section id="networking" class="content-section">
+            <h2><i class="fas fa-sitemap"></i> OpenShift Networking - Deep Dive</h2>
+            <p>OpenShift provides advanced networking capabilities through OVN-Kubernetes (default CNI plugin). Understanding the networking flow is crucial for troubleshooting and designing applications.</p>
+
+            <!-- Image Path: Update in config.js -->
+            <div class="diagram-container">
+                <img src="images/networking-flow.png" alt="OpenShift Networking Flow" class="diagram-image">
+                <p class="image-caption">Complete networking flow in OpenShift</p>
+            </div>
+
+            <div class="info-box">
+                <h4>Core Networking Components:</h4>
+                <ul>
+                    <li><strong>OVN-Kubernetes:</strong> Default CNI plugin providing network connectivity</li>
+                    <li><strong>Pod Network:</strong> Flat network where all pods can communicate</li>
+                    <li><strong>Service Network:</strong> ClusterIP network for stable service endpoints</li>
+                    <li><strong>HAProxy Router:</strong> OpenShift's ingress controller for external access</li>
+                    <li><strong>Endpoints:</strong> Dynamic list of pod IPs backing a service</li>
+                </ul>
+            </div>
+
+            <h3>Pod and Service Communication</h3>
+
+            <div class="info-box">
+                <h4>Important Networking Facts:</h4>
+                <ul>
+                    <li><strong>Pod IPs are ephemeral:</strong> Pod IPs change when pods are recreated or rescheduled</li>
+                    <li><strong>ClusterIP is stable:</strong> Service ClusterIP never changes - it's the stable endpoint</li>
+                    <li><strong>Endpoints track Pods:</strong> Endpoints resource contains all Pod IPs for a service and updates automatically</li>
+                    <li><strong>Always use Services:</strong> Never hardcode Pod IPs - always communicate via ClusterIP services</li>
+                </ul>
+            </div>
+
+            <div class="info-box">
+                <h4>Kubernetes Workload Hierarchy:</h4>
+                <ul>
+                    <li><strong>Pod:</strong> Smallest unit, contains one or more containers</li>
+                    <li><strong>ReplicaSet:</strong> Ensures specific number of pod replicas are running</li>
+                    <li><strong>Deployment:</strong> Manages ReplicaSets, provides rolling updates and rollbacks</li>
+                    <li><strong>Service:</strong> Stable network endpoint that load balances across pods</li>
+                </ul>
+            </div>
+
+            <h3>Service Types and Limitations</h3>
+
+            <div class="info-box">
+                <h4>1. ClusterIP (Default)</h4>
+                <ul>
+                    <li><strong>Scope:</strong> Only accessible within the cluster</li>
+                    <li><strong>Use Case:</strong> Internal service-to-service communication</li>
+                    <li><strong>Limitation:</strong> Cannot be accessed from outside the cluster</li>
+                    <li><strong>IP Range:</strong> Allocated from service network CIDR</li>
+                </ul>
+            </div>
+
+            <div class="info-box">
+                <h4>2. NodePort</h4>
+                <ul>
+                    <li><strong>Scope:</strong> Exposes service on each node's IP at a static port (30000-32767)</li>
+                    <li><strong>Use Case:</strong> Expose service externally on bare metal clusters</li>
+                    <li><strong>Access:</strong> &lt;NodeIP&gt;:&lt;NodePort&gt;</li>
+                    <li><strong>Limitation:</strong> Requires opening firewall ports, not ideal for production</li>
+                </ul>
+            </div>
+
+            <div class="info-box">
+                <h4>3. LoadBalancer</h4>
+                <ul>
+                    <li><strong>Scope:</strong> Provisions external load balancer (cloud or MetalLB)</li>
+                    <li><strong>Use Case:</strong> Expose service externally with dedicated external IP</li>
+                    <li><strong>Requirement:</strong> Cloud provider integration or MetalLB for bare metal</li>
+                    <li><strong>Best For:</strong> Non-HTTP services (databases, gRPC, etc.)</li>
+                </ul>
+            </div>
+
+            <div class="info-box">
+                <h4>4. ExternalIP</h4>
+                <ul>
+                    <li><strong>Manual Assignment:</strong> Assign specific external IP to service</li>
+                    <li><strong>Limitation:</strong> Must use node's IP (creates single point of failure)</li>
+                    <li><strong>Problem:</strong> If node goes down, service becomes unavailable</li>
+                    <li><strong>Solution:</strong> Use LoadBalancer with MetalLB for automatic failover</li>
+                </ul>
+            </div>
+
+            <h3>Request Flow: User to Pod</h3>
+
+            <div class="info-box">
+                <h4>HTTP/HTTPS Request Flow:</h4>
+                <ol style="margin-left: 2rem;">
+                    <li><strong>User Request:</strong> User types URL in browser (e.g., https://myapp.apps.cluster.com)</li>
+                    <li><strong>DNS Resolution:</strong> Browser resolves hostname to load balancer IP</li>
+                    <li><strong>Physical Load Balancer:</strong> External LB receives encrypted HTTPS traffic</li>
+                    <li><strong>HAProxy Router:</strong> OpenShift's ingress controller (based on HAProxy)</li>
+                    <li><strong>Endpoint Lookup:</strong> HAProxy reads Endpoints to find backend pod IPs</li>
+                    <li><strong>Pod Delivery:</strong> Traffic routed directly to pod (bypassing Service)</li>
+                </ol>
+            </div>
+
+            <div class="warning-box">
+                <i class="fas fa-info-circle"></i>
+                <div>
+                    <strong>Key Insight:</strong> The HAProxy router reads the Endpoints resource (which lists all pod IPs) and routes traffic directly to pods, bypassing the Service ClusterIP. However, Services are still needed because they create and maintain the Endpoints resource.
+                </div>
+            </div>
+
+            <div class="info-box">
+                <h4>Simplified Flow:</h4>
+                <code>User → Browser (adds hostname) → Load Balancer → HAProxy → Checks Endpoints → Routes to Pod</code>
+            </div>
+
+            <h3>TLS Termination Types</h3>
+
+            <div class="code-block">
+                <div class="code-header">
+                    <span>TLS Configuration Example</span>
+                    <button class="copy-btn" onclick="copyCode(this)"><i class="fas fa-copy"></i></button>
+                </div>
+                <pre><code>apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  name: myapp-route
+spec:
+  host: myapp.apps.cluster.example.com
+  to:
+    kind: Service
+    name: myapp-service
+  tls:
+    termination: edge  # or reencrypt or passthrough
+    insecureEdgeTerminationPolicy: Redirect
+    # Redirect automatically redirects HTTP to HTTPS</code></pre>
+            </div>
+
+            <h4>1. Edge Termination</h4>
+            <div class="info-box">
+                <ul>
+                    <li><strong>Flow:</strong> User → HTTPS → HAProxy (decrypts) → Pod (HTTP)</li>
+                    <li><strong>Description:</strong> TLS terminated at router, plain HTTP to pod</li>
+                    <li><strong>Layer:</strong> Layer 7 (Application Layer) - can read request content</li>
+                    <li><strong>Use Case:</strong> Most common, router can inspect traffic, add headers, etc.</li>
+                    <li><strong>Performance:</strong> Moderate (encryption/decryption overhead)</li>
+                </ul>
+            </div>
+
+            <h4>2. Re-encrypt</h4>
+            <div class="info-box">
+                <ul>
+                    <li><strong>Flow:</strong> User → HTTPS → HAProxy (decrypt + re-encrypt) → Pod (HTTPS)</li>
+                    <li><strong>Description:</strong> TLS terminated at router, then re-encrypted to pod</li>
+                    <li><strong>Layer:</strong> Layer 7 (Application Layer)</li>
+                    <li><strong>Use Case:</strong> End-to-end encryption, compliance requirements</li>
+                    <li><strong>Performance:</strong> Slowest (decrypt + re-encrypt overhead)</li>
+                    <li><strong>Requirement:</strong> Pod must have TLS certificate</li>
+                </ul>
+            </div>
+
+            <h4>3. Passthrough</h4>
+            <div class="info-box">
+                <ul>
+                    <li><strong>Flow:</strong> User → HTTPS → HAProxy (no decryption) → Pod (HTTPS)</li>
+                    <li><strong>Description:</strong> Encrypted traffic passes through router without decryption</li>
+                    <li><strong>Layer:</strong> Layer 4 (Transport Layer) - cannot read content</li>
+                    <li><strong>Use Case:</strong> Maximum security, pod handles all TLS</li>
+                    <li><strong>Performance:</strong> Fastest (no encryption overhead at router)</li>
+                    <li><strong>Limitation:</strong> Cannot use path-based routing (hostname only)</li>
+                    <li><strong>How it routes:</strong> Uses SNI (Server Name Indication) from TLS handshake</li>
+                </ul>
+            </div>
+
+            <div class="warning-box">
+                <i class="fas fa-question-circle"></i>
+                <div>
+                    <strong>Question:</strong> How does Passthrough know where to route if it doesn't decrypt?<br>
+                    <strong>Answer:</strong> It uses SNI (Server Name Indication) from the TLS handshake. The hostname is transmitted in plaintext during the initial TLS handshake, allowing the router to route based on hostname without decrypting the actual payload.
+                </div>
+            </div>
+
+            <div class="info-box">
+                <h4>Layer 4 vs Layer 7 Load Balancing:</h4>
+                <ul>
+                    <li><strong>Layer 4 (Passthrough):</strong> Works at TCP level, faster, cannot inspect content</li>
+                    <li><strong>Layer 7 (Edge/Re-encrypt):</strong> Works at HTTP level, slower, can inspect and modify content</li>
+                </ul>
+            </div>
+
+            <h3>Internal Routing and Certificates</h3>
+
+            <div class="info-box">
+                <h4>Service CA Operator:</h4>
+                <ul>
+                    <li>Runs in <code>openshift-service-ca</code> namespace</li>
+                    <li>Automatically generates certificates for internal services</li>
+                    <li>Uses Service FQDN as certificate subject</li>
+                    <li>Certificates injected via annotations on secrets/configmaps</li>
+                </ul>
+            </div>
+
+            <div class="code-block">
+                <div class="code-header">
+                    <span>Service CA Certificate Injection</span>
+                    <button class="copy-btn" onclick="copyCode(this)"><i class="fas fa-copy"></i></button>
+                </div>
+                <pre><code>apiVersion: v1
+kind: Service
+metadata:
+  name: myapp
+  annotations:
+    service.beta.openshift.io/serving-cert-secret-name: myapp-tls
+spec:
+  ports:
+  - port: 8443
+    targetPort: 8443
+  selector:
+    app: myapp
+
+---
+# Secret automatically created by service-ca operator
+apiVersion: v1
+kind: Secret
+metadata:
+  name: myapp-tls
+type: kubernetes.io/tls
+data:
+  tls.crt: ...  # Auto-generated certificate
+  tls.key: ...  # Auto-generated key</code></pre>
+            </div>
+
+            <div class="info-box">
+                <h4>Certificate Management Options:</h4>
+                <ul>
+                    <li><strong>service-ca operator:</strong> Internal OpenShift certificates (default)</li>
+                    <li><strong>cert-manager:</strong> Automated certificate management, can use Let's Encrypt</li>
+                    <li><strong>OSSM (OpenShift Service Mesh):</strong> Automatic mTLS between services</li>
+                </ul>
+            </div>
+
+            <h3>Ingress Controller Management</h3>
+
+            <div class="code-block">
+                <div class="code-header">
+                    <span>Ingress Management Commands</span>
+                    <button class="copy-btn" onclick="copyCode(this)"><i class="fas fa-copy"></i></button>
+                </div>
+                <pre><code># View router pods
+oc get pods -n openshift-ingress
+
+# View ingress controller config
+oc get ingresscontroller -n openshift-ingress-operator
+
+# Edit ingress controller (e.g., change replicas)
+oc edit ingresscontroller default -n openshift-ingress-operator
+
+# View network configuration
+oc get network.config.openshift.io cluster -o yaml
+
+# Cannot directly edit router pods - operator will revert changes
+# Must use IngressController CR to make changes</code></pre>
+            </div>
+
+            <h3>Edge Routing Details</h3>
+
+            <div class="info-box">
+                <h4>Network Interface Card (NIC) Perspective:</h4>
+                <ul>
+                    <li><strong>User Side (NIC-1):</strong> Sees encrypted HTTPS traffic</li>
+                    <li><strong>Pod Side (NIC-2):</strong> Sees decrypted HTTP traffic (ends with .2 in IP)</li>
+                    <li><strong>Router:</strong> Uses 2 NICs and routing table to forward traffic</li>
+                    <li><strong>Gateway-1:</strong> Faces external network (internet)</li>
+                    <li><strong>Gateway-2:</strong> Faces internal pod network</li>
+                </ul>
+            </div>
+
+            <h3>cURL for Debugging</h3>
+
+            <div class="code-block">
+                <div class="code-header">
+                    <span>cURL Debugging Commands</span>
+                    <button class="copy-btn" onclick="copyCode(this)"><i class="fas fa-copy"></i></button>
+                </div>
+                <pre><code># Ignore self-signed certificates
+curl -k https://myapp.apps.cluster.com
+
+# Verbose output (shows TLS handshake)
+curl -v https://myapp.apps.cluster.com
+
+# Output explanation:
+# * TCP connection established (Layer 4)
+# * TLS handshake (Layer 6 - Presentation)
+# > Request headers being sent
+# < Response headers being received
+
+# Test specific host header
+curl -H "Host: myapp.apps.cluster.com" http://router-ip
+
+# Follow redirects
+curl -L http://myapp.apps.cluster.com
+
+# Test from inside cluster
+oc run curl-test --image=curlimages/curl -it --rm -- \
+  curl http://myapp-service.myapp.svc.cluster.local:8080</code></pre>
+            </div>
+
+            <h3>MetalLB: Load Balancer for Bare Metal</h3>
+
+            <p>MetalLB provides LoadBalancer service implementation for bare metal Kubernetes clusters, where cloud load balancers are not available.</p>
+
+            <h4>Layer 2 Mode (L2Advertisement)</h4>
+
+            <div class="info-box">
+                <h4>How L2 Mode Works:</h4>
+                <ul>
+                    <li><strong>Protocol:</strong> Uses ARP (Address Resolution Protocol)</li>
+                    <li><strong>Mechanism:</strong> One node "owns" the IP and responds to ARP requests</li>
+                    <li><strong>Components:</strong>
+                        <ul>
+                            <li>IP Address Pool: Range of IPs to assign</li>
+                            <li>L2Advertisement: Announces IPs to network</li>
+                            <li>Speaker: DaemonSet running on each node</li>
+                        </ul>
+                    </li>
+                    <li><strong>Failure Handling:</strong> If node fails, Speaker stops → MetalLB assigns IP to another node</li>
+                    <li><strong>Limitation:</strong> Single node handles ALL traffic (bottleneck)</li>
+                </ul>
+            </div>
+
+            <div class="info-box">
+                <h4>ARP (Address Resolution Protocol):</h4>
+                <ul>
+                    <li><strong>Layer:</strong> Layer 2 (Data Link)</li>
+                    <li><strong>Purpose:</strong> Resolve IP address to MAC address</li>
+                    <li><strong>Broadcast:</strong> Node can broadcast to all IPs in pool to announce its MAC address</li>
+                    <li><strong>GARP:</strong> Gratuitous ARP - announces IP/MAC mapping to all nodes proactively</li>
+                    <li><strong>MAC Spoofing:</strong> When two MACs claim same IP (security issue)</li>
+                </ul>
+            </div>
+
+            <div class="code-block">
+                <div class="code-header">
+                    <span>ARP Commands</span>
+                    <button class="copy-btn" onclick="copyCode(this)"><i class="fas fa-copy"></i></button>
+                </div>
+                <pre><code># Get MAC address of IP
+arping -i eth0 <ip-address>
+
+# View ARP cache
+arp -a
+
+# Clear ARP cache
+ip -s -s neigh flush all</code></pre>
+            </div>
+
+            <h4>BGP Mode (Border Gateway Protocol)</h4>
+
+            <div class="info-box">
+                <h4>How BGP Mode Works:</h4>
+                <ul>
+                    <li><strong>Protocol:</strong> Layer 3 routing protocol</li>
+                    <li><strong>Mechanism:</strong> BGP router dynamically routes to multiple nodes</li>
+                    <li><strong>Advantage:</strong> Traffic distributed across multiple nodes (no bottleneck)</li>
+                    <li><strong>Components:</strong>
+                        <ul>
+                            <li>BGP Peers: Router configuration (where are peer routers)</li>
+                            <li>BGP Advertisement: Announces service IPs</li>
+                            <li>FRR (Free Range Routing): Application that announces IP-to-MAC mappings</li>
+                            <li>BFD (Bidirectional Forwarding Detection): Monitors BGP router connectivity</li>
+                        </ul>
+                    </li>
+                    <li><strong>Use Case:</strong> Production environments, 5G/4G applications</li>
+                </ul>
+            </div>
+
+            <div class="warning-box">
+                <i class="fas fa-info-circle"></i>
+                <div>
+                    <strong>BGP Requirements:</strong> You need BGP Peers + BGP Advertisement + IP Address Pool configured for BGP mode to work.
+                </div>
+            </div>
+
+            <h3>Multus CNI: Multiple Network Interfaces</h3>
+
+            <p>Multus is a CNI plugin that enables attaching multiple network interfaces to pods. OVN-Kubernetes provides the primary interface (eth0), while Multus adds secondary interfaces (eth1, eth2, etc.).</p>
+
+            <div class="info-box">
+                <h4>Why Use Multus:</h4>
+                <ul>
+                    <li><strong>OpenShift Virtualization:</strong> VMs in pods need direct network access from outside</li>
+                    <li><strong>High-Performance Workloads:</strong> Dedicated 10Gbps NIC for specific pods</li>
+                    <li><strong>Network Isolation:</strong> Separate management and data plane networks</li>
+                    <li><strong>Hypershift (OCP on OCP):</strong> Nested cluster networking</li>
+                </ul>
+            </div>
+
+            <div class="info-box">
+                <h4>How Multus Works:</h4>
+                <ol style="margin-left: 2rem;">
+                    <li>Physical network interface attached to node</li>
+                    <li>Create bridge between node network and pod network (e.g., Linux Bridge "br0")</li>
+                    <li>Bridge connects to pod, assigns IP from node's IP pool</li>
+                    <li>Pod now accessible directly from outside cluster</li>
+                </ol>
+            </div>
+
+            <div class="info-box">
+                <h4>Multus Components:</h4>
+                <ul>
+                    <li><strong>Primary CNI:</strong> OVN-Kubernetes (handles eth0, pod-to-pod communication)</li>
+                    <li><strong>Secondary CNI:</strong> Multus (adds eth1, eth2, etc.)</li>
+                    <li><strong>NAD:</strong> NetworkAttachmentDefinition (CR defining network config)</li>
+                    <li><strong>IPAM:</strong> IP Address Management (static, DHCP, whereabouts)</li>
+                    <li><strong>Bridge Types:</strong> Linux Bridge, OVN Bridge, MACVLAN, IPVLAN, SR-IOV</li>
+                </ul>
+            </div>
+
+            <div class="info-box">
+                <h4>Use Case: Multiple NICs with Bonding</h4>
+                <p><strong>Problem:</strong> Most pods use 1Gbps NIC, but some need 10Gbps. Adding 10Gbps NIC to all pods is wasteful.</p>
+                <p><strong>Solution:</strong></p>
+                <ul>
+                    <li>Add secondary 10Gbps NIC card to node</li>
+                    <li>Bond it with primary NIC</li>
+                    <li>Use Multus to assign node IPs to specific pods that need 10Gbps</li>
+                    <li>Benefits: External accessibility + dedicated high-speed network</li>
+                </ul>
+            </div>
+
+            <div class="warning-box">
+                <i class="fas fa-lightbulb"></i>
+                <div>
+                    <strong>Important:</strong> NAD is supported in both Kubernetes and OpenShift. OpenShift also provides UDN (User Defined Networks) and CUDN which use NAD in the background.
+                </div>
+            </div>
+        </section>
+
+        <section id="hcp" class="content-section">
+            <h2><i class="fas fa-cloud"></i> Hosted Control Planes (HCP)</h2>
+            <p>Hosted Control Planes allow the control plane components (API server, etcd, controllers) to run on a separate hosting cluster, reducing infrastructure costs and improving scalability.</p>
+
+            <!-- Image Paths: Update in config.js -->
+            <div class="diagram-container">
+                <img src="images/hcp-architecture.png" alt="HCP Architecture" class="diagram-image">
+                <p class="image-caption">Hosted Control Planes Prerequisites</p>
+            </div>
+
+            <div class="diagram-container">
+                <img src="images/hub-cluster-operators.png" alt="Hub Cluster with Operators" class="diagram-image">
+                <p class="image-caption">Hub Cluster Architecture with OCP Operators</p>
+            </div>
+
+            <div class="info-box">
+                <h4>HCP Benefits:</h4>
+                <ul>
+                    <li><strong>Cost Reduction:</strong> No need for dedicated master nodes per cluster (saves 3 nodes per cluster)</li>
+                    <li><strong>Faster Provisioning:</strong> Clusters can be created in minutes instead of hours</li>
+                    <li><strong>Better Multi-tenancy:</strong> Control planes are isolated in separate namespaces</li>
+                    <li><strong>Simplified Management:</strong> Centralized control plane management on hub cluster</li>
+                    <li><strong>Resource Efficiency:</strong> Control planes run as pods, better resource utilization</li>
+                </ul>
+            </div>
+
+            <div class="info-box">
+                <h4>Key Components:</h4>
+                <ul>
+                    <li><strong>MCE (Multicluster Engine):</strong> Provides the foundation for HCP and cluster lifecycle management</li>
+                    <li><strong>HyperShift Operator:</strong> Manages hosted control planes lifecycle</li>
+                    <li><strong>MetalLB:</strong> Provides VIP (Virtual IP) assignment for hosted cluster API endpoints</li>
+                    <li><strong>ODF (OpenShift Data Foundation):</strong> Provides persistent storage for etcd and control plane data</li>
+                    <li><strong>OpenShift Virtualization:</strong> Runs control plane components as VMs inside pods (optional)</li>
+                </ul>
+            </div>
+
+            <div class="info-box">
+                <h4>Architecture Overview:</h4>
+                <ul>
+                    <li><strong>Hub Cluster:</strong> Hosts the control planes of multiple managed clusters</li>
+                    <li><strong>Managed Cluster:</strong> Only has worker nodes, control plane runs on hub</li>
+                    <li><strong>Control Plane as Pods:</strong> API server, etcd, controllers run as pods in hub cluster</li>
+                    <li><strong>Worker Nodes:</strong> Connect to hosted control plane via VIP exposed by MetalLB</li>
+                </ul>
+            </div>
+
+            <div class="info-box">
+                <h4>HCP vs Traditional OpenShift:</h4>
+                <table style="width: 100%; margin-top: 1rem; border-collapse: collapse;">
+                    <tr style="background-color: var(--code-bg);">
+                        <th style="padding: 0.75rem; border: 1px solid var(--border-color);">Aspect</th>
+                        <th style="padding: 0.75rem; border: 1px solid var(--border-color);">Traditional</th>
+                        <th style="padding: 0.75rem; border: 1px solid var(--border-color);">HCP</th>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">Master Nodes</td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">3 dedicated nodes</td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">0 (runs as pods)</td>
+                    </tr>
+                    <tr style="background-color: var(--code-bg);">
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">Provisioning Time</td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">30-60 minutes</td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">5-10 minutes</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">Resource Usage</td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">High (dedicated masters)</td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">Low (shared resources)</td>
+                    </tr>
+                    <tr style="background-color: var(--code-bg);">
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">Isolation</td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">Full hardware isolation</td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">Namespace isolation</td>
+                    </tr>
+                </table>
+            </div>
+
+            <div class="info-box">
+                <h4>Common Use Cases:</h4>
+                <ul>
+                    <li>Edge computing deployments with many small clusters</li>
+                    <li>Development/test environments requiring rapid cluster creation</li>
+                    <li>Multi-tenant environments with isolated control planes</li>
+                    <li>Cost-sensitive environments where master node costs are prohibitive</li>
+                </ul>
+            </div>
+        </section>
+
+        <section id="acm" class="content-section">
+            <h2><i class="fas fa-globe"></i> Advanced Cluster Management (ACM)</h2>
+            <p>Red Hat Advanced Cluster Management for Kubernetes provides end-to-end management visibility and control for managing multiple Kubernetes clusters across hybrid cloud environments.</p>
+
+            <div class="info-box">
+                <h4>Key Features:</h4>
+                <ul>
+                    <li><strong>Multi-cluster Management:</strong> Manage hundreds of clusters from a single console (hub cluster)</li>
+                    <li><strong>Application Lifecycle:</strong> Deploy and manage applications across multiple clusters using GitOps</li>
+                    <li><strong>Governance & Risk:</strong> Policy-based governance, compliance, and security management</li>
+                    <li><strong>Observability:</strong> Centralized monitoring, logging, and distributed tracing</li>
+                    <li><strong>Cluster Lifecycle:</strong> Create, import, upgrade, and destroy clusters</li>
+                </ul>
+            </div>
+
+            <div class="info-box">
+                <h4>ACM Architecture:</h4>
+                <ul>
+                    <li><strong>Hub Cluster:</strong> Central management cluster running ACM components</li>
+                    <li><strong>Managed Clusters:</strong> Clusters managed by ACM (can be OpenShift or vanilla Kubernetes)</li>
+                    <li><strong>Klusterlet:</strong> Agent running on managed clusters that communicates with hub</li>
+                    <li><strong>Application Model:</strong> Channel, Subscription, PlacementRule for app deployment</li>
+                </ul>
+            </div>
+
+            <div class="info-box">
+                <h4>Policy Management:</h4>
+                <ul>
+                    <li><strong>Policy Types:</strong>
+                        <ul>
+                            <li>Configuration Policy: Enforce resource configuration</li>
+                            <li>Certificate Policy: Manage certificate expiration</li>
+                            <li>IAM Policy: Enforce identity and access policies</li>
+                            <li>Compliance Policies: NIST, HIPAA, PCI-DSS compliance</li>
+                        </ul>
+                    </li>
+                    <li><strong>Remediation:</strong> Inform (report only) or Enforce (auto-remediate)</li>
+                    <li><strong>Placement:</strong> Apply policies to specific clusters using labels</li>
+                </ul>
+            </div>
+
+            <div class="info-box">
+                <h4>Application Deployment Model:</h4>
+                <ul>
+                    <li><strong>Channel:</strong> Source repository (Git, Helm, Object Storage)</li>
+                    <li><strong>Subscription:</strong> Defines which applications to deploy from channel</li>
+                    <li><strong>PlacementRule:</strong> Determines which clusters receive the application</li>
+                    <li><strong>Application:</strong> Groups all components (subscriptions, channels)</li>
+                </ul>
+            </div>
+
+            <div class="info-box">
+                <h4>Cluster Lifecycle Management:</h4>
+                <ul>
+                    <li>Create clusters on AWS, Azure, GCP, VMware, bare metal</li>
+                    <li>Import existing Kubernetes/OpenShift clusters</li>
+                    <li>Upgrade clusters in controlled manner</li>
+                    <li>Hibernate clusters to save costs</li>
+                    <li>Destroy clusters when no longer needed</li>
+                </ul>
+            </div>
+
+            <div class="info-box">
+                <h4>Observability:</h4>
+                <ul>
+                    <li>Centralized Grafana dashboards for all clusters</li>
+                    <li>Thanos for long-term metrics storage</li>
+                    <li>Alert management across clusters</li>
+                    <li>Search and query across cluster resources</li>
+                </ul>
+            </div>
+        </section>
+
+        <section id="olm" class="content-section">
+            <h2><i class="fas fa-box"></i> Operator Lifecycle Manager (OLM)</h2>
+            <p>OLM extends Kubernetes to provide a declarative way to install, manage, and upgrade operators and their dependencies in a cluster. It's the package manager for Kubernetes operators.</p>
+
+            <div class="info-box">
+                <h4>Key Concepts:</h4>
+                <ul>
+                    <li><strong>Operator:</strong> A method of packaging, deploying, and managing Kubernetes applications using custom controllers</li>
+                    <li><strong>CatalogSource:</strong> Repository of operator metadata (like a package repository)</li>
+                    <li><strong>Subscription:</strong> Tracks a channel in a catalog for automatic updates</li>
+                    <li><strong>InstallPlan:</strong> Calculated list of resources to be created for operator installation</li>
+                    <li><strong>CSV (ClusterServiceVersion):</strong> Metadata about the operator (version, description, permissions, etc.)</li>
+                    <li><strong>OperatorGroup:</strong> Defines which namespaces the operator can watch</li>
+                </ul>
+            </div>
+
+            <div class="info-box">
+                <h4>Operator Maturity Levels:</h4>
+                <ol style="margin-left: 2rem;">
+                    <li><strong>Level 1 - Basic Install:</strong> Automated deployment</li>
+                    <li><strong>Level 2 - Seamless Upgrades:</strong> Automated updates without downtime</li>
+                    <li><strong>Level 3 - Full Lifecycle:</strong> Backup, failure recovery, scaling</li>
+                    <li><strong>Level 4 - Deep Insights:</strong> Metrics, alerts, log processing</li>
+                    <li><strong>Level 5 - Auto Pilot:</strong> Auto-scaling, auto-healing, tuning</li>
+                </ol>
+            </div>
+
+            <div class="info-box">
+                <h4>OLM Components:</h4>
+                <ul>
+                    <li><strong>OLM Operator:</strong> Manages CSV, InstallPlans, Subscriptions</li>
+                    <li><strong>Catalog Operator:</strong> Watches CatalogSources and resolves dependencies</li>
+                    <li><strong>OperatorHub:</strong> Web UI for discovering and installing operators</li>
+                    <li><strong>Default Catalogs:</strong>
+                        <ul>
+                            <li>redhat-operators: Red Hat certified operators</li>
+                            <li>certified-operators: Partner certified operators</li>
+                            <li>community-operators: Community contributed operators</li>
+                            <li>redhat-marketplace: Red Hat Marketplace operators</li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="info-box">
+                <h4>Subscription Channels:</h4>
+                <ul>
+                    <li><strong>stable:</strong> Production-ready stable releases</li>
+                    <li><strong>fast:</strong> Latest features, more frequent updates</li>
+                    <li><strong>candidate:</strong> Release candidates for testing</li>
+                    <li><strong>Version-specific:</strong> e.g., stable-4.14, stable-4.15</li>
+                </ul>
+            </div>
+
+            <div class="info-box">
+                <h4>Approval Strategies:</h4>
+                <ul>
+                    <li><strong>Automatic:</strong> Operator updates installed automatically</li>
+                    <li><strong>Manual:</strong> Admin must approve InstallPlan before update</li>
+                </ul>
+            </div>
+
+            <div class="info-box">
+                <h4>Operator Scope:</h4>
+                <ul>
+                    <li><strong>Namespace-scoped:</strong> Operator watches resources in specific namespaces (defined by OperatorGroup)</li>
+                    <li><strong>Cluster-scoped:</strong> Operator watches resources across all namespaces (installed in openshift-operators)</li>
+                </ul>
+            </div>
+        </section>
+
+        <section id="cvo" class="content-section">
+            <h2><i class="fas fa-sync-alt"></i> Cluster Version Operator (CVO)</h2>
+            <p>The Cluster Version Operator manages the lifecycle of cluster operators and ensures the cluster is at the desired version. It orchestrates cluster updates and monitors operator health.</p>
+
+            <div class="info-box">
+                <h4>Responsibilities:</h4>
+                <ul>
+                    <li><strong>Cluster Updates:</strong> Orchestrates upgrades to new OpenShift versions</li>
+                    <li><strong>Operator Management:</strong> Ensures cluster operators are running and healthy</li>
+                    <li><strong>Rollback Management:</strong> Handles rollbacks if updates fail</li>
+                    <li><strong>Version Reporting:</strong> Reports current cluster version and available updates</li>
+                    <li><strong>Payload Management:</strong> Downloads and applies cluster update payloads</li>
+                </ul>
+            </div>
+
+            <div class="info-box">
+                <h4>Cluster Operators Managed by CVO:</h4>
+                <ul>
+                    <li><strong>authentication:</strong> OAuth server for cluster authentication</li>
+                    <li><strong>cloud-credential:</strong> Manages cloud provider credentials</li>
+                    <li><strong>console:</strong> OpenShift web console</li>
+                    <li><strong>dns:</strong> CoreDNS for cluster DNS</li>
+                    <li><strong>ingress:</strong> HAProxy-based router</li>
+                    <li><strong>kube-apiserver:</strong> Kubernetes API server</li>
+                    <li><strong>kube-controller-manager:</strong> Kubernetes controllers</li>
+                    <li><strong>kube-scheduler:</strong> Pod scheduler</li>
+                    <li><strong>machine-api:</strong> Machine management</li>
+                    <li><strong>machine-config:</strong> Node OS configuration</li>
+                    <li><strong>network:</strong> Cluster networking (OVN-Kubernetes)</li>
+                    <li><strong>storage:</strong> Storage management</li>
+                    <li>...and many more</li>
+                </ul>
+            </div>
+
+            <div class="info-box">
+                <h4>Cluster Version Channels:</h4>
+                <ul>
+                    <li><strong>stable-X.Y:</strong> Production-ready releases (e.g., stable-4.14)</li>
+                    <li><strong>fast-X.Y:</strong> Latest updates, tested but more frequent</li>
+                    <li><strong>candidate-X.Y:</strong> Release candidates for testing</li>
+                    <li><strong>eus-X.Y:</strong> Extended Update Support (long-term support releases)</li>
+                </ul>
+            </div>
+
+            <div class="info-box">
+                <h4>Update Process:</h4>
+                <ol style="margin-left: 2rem;">
+                    <li>CVO checks for available updates from configured channel</li>
+                    <li>Admin initiates update (or automatic if configured)</li>
+                    <li>CVO downloads update payload (container images)</li>
+                    <li>Updates cluster operators one by one</li>
+                    <li>Each operator updates its managed resources</li>
+                    <li>Worker nodes updated via Machine Config Operator (rolling update)</li>
+                    <li>CVO verifies all operators are healthy after update</li>
+                </ol>
+            </div>
+
+            <div class="info-box">
+                <h4>Operator Status Conditions:</h4>
+                <ul>
+                    <li><strong>Available:</strong> Operator is providing its service</li>
+                    <li><strong>Progressing:</strong> Operator is updating to new version</li>
+                    <li><strong>Degraded:</strong> Operator is not functioning correctly</li>
+                </ul>
+            </div>
+
+            <div class="info-box">
+                <h4>Pausing Operator Management:</h4>
+                <p>For maintenance, you can mark specific operators as "unmanaged" so CVO doesn't reconcile them. This is useful when making manual changes for testing or debugging.</p>
+            </div>
+        </section>
+
+        <section id="machine-config" class="content-section">
+            <h2><i class="fas fa-server"></i> Machine Config Operator</h2>
+            <p>The Machine Config Operator (MCO) manages operating system configuration and updates for OpenShift nodes. It ensures nodes have the correct OS configuration defined by MachineConfig resources.</p>
+
+            <div class="info-box">
+                <h4>Key Components:</h4>
+                <ul>
+                    <li><strong>MachineConfig:</strong> Defines OS-level configuration (files, systemd units, kernel arguments)</li>
+                    <li><strong>MachineConfigPool:</strong> Groups nodes for configuration (master, worker, or custom pools)</li>
+                    <li><strong>MachineConfigDaemon:</strong> Runs on each node, applies configs and handles reboots</li>
+                    <li><strong>MachineConfigServer:</strong> Serves Ignition configs during boot</li>
+                    <li><strong>MachineConfigController:</strong> Monitors and renders MachineConfigs</li>
+                    <li><strong>ContainerRuntimeConfig:</strong> Configures CRI-O container runtime settings</li>
+                </ul>
+            </div>
+
+            <div class="info-box">
+                <h4>What Can Be Configured:</h4>
+                <ul>
+                    <li><strong>Files:</strong> Create/modify files on the node filesystem</li>
+                    <li><strong>Systemd Units:</strong> Create or modify systemd services</li>
+                    <li><strong>Kernel Arguments:</strong> Add kernel boot parameters</li>
+                    <li><strong>Kernel Modules:</strong> Load specific kernel modules</li>
+                    <li><strong>FIPS Mode:</strong> Enable FIPS cryptography</li>
+                    <li><strong>SSH Keys:</strong> Authorize SSH keys for core user</li>
+                    <li><strong>Container Runtime:</strong> Configure CRI-O settings</li>
+                </ul>
+            </div>
+
+            <div class="info-box">
+                <h4>MachineConfigPool Update Strategy:</h4>
+                <ul>
+                    <li><strong>Rolling Update:</strong> Nodes updated one at a time (or per maxUnavailable setting)</li>
+                    <li><strong>maxUnavailable:</strong> Maximum number of nodes updating simultaneously</li>
+                    <li><strong>Paused:</strong> Pool can be paused to prevent automatic updates</li>
+                    <li><strong>Reboot Required:</strong> Most MachineConfig changes require node reboot</li>
+                </ul>
+            </div>
+
+            <div class="info-box">
+                <h4>Ignition:</h4>
+                <p>MachineConfig uses Ignition (not cloud-init) for initial node configuration:</p>
+                <ul>
+                    <li>Ignition v3.2.0 format</li>
+                    <li>Declarative configuration applied during first boot</li>
+                    <li>Files must be base64-encoded</li>
+                    <li>More robust than cloud-init for immutable infrastructure</li>
+                </ul>
+            </div>
+
+            <div class="info-box">
+                <h4>Custom MachineConfigPools:</h4>
+                <p>You can create custom pools for nodes with special requirements:</p>
+                <ul>
+                    <li>Infra nodes for infrastructure workloads</li>
+                    <li>GPU nodes with specific drivers</li>
+                    <li>High-performance nodes with custom kernel tuning</li>
+                </ul>
+            </div>
+
+            <div class="info-box">
+                <h4>ContainerRuntimeConfig:</h4>
+                <ul>
+                    <li><strong>pidsLimit:</strong> Max PIDs per container</li>
+                    <li><strong>logLevel:</strong> CRI-O logging level</li>
+                    <li><strong>logSizeMax:</strong> Max log file size</li>
+                    <li><strong>overlaySize:</strong> Container overlay filesystem size</li>
+                </ul>
+            </div>
+        </section>
+
+        <section id="virtualization" class="content-section">
+            <h2><i class="fas fa-desktop"></i> OpenShift Virtualization</h2>
+            <p>OpenShift Virtualization allows you to run virtual machines alongside containers in OpenShift, providing a unified platform for both VMs and containerized applications. It's based on the upstream KubeVirt project.</p>
+
+            <!-- Image Path: Update in config.js -->
+            <div class="diagram-container">
+                <img src="images/virtualization-architecture.png" alt="OpenShift Virtualization Architecture" class="diagram-image">
+                <p class="image-caption">OpenShift Virtualization Architecture</p>
+            </div>
+
+            <div class="info-box">
+                <h4>Key Features:</h4>
+                <ul>
+                    <li><strong>Unified Platform:</strong> Run VMs and containers on the same OpenShift cluster</li>
+                    <li><strong>Kubernetes-native:</strong> Manage VMs using Kubernetes APIs and kubectl/oc commands</li>
+                    <li><strong>Live Migration:</strong> Move running VMs between nodes without downtime</li>
+                    <li><strong>VM Templates:</strong> Reusable VM templates for quick deployment</li>
+                    <li><strong>Storage Integration:</strong> Use OpenShift storage (ODF, Ceph, NFS) for VM disks</li>
+                    <li><strong>Networking Integration:</strong> VMs use OpenShift SDN and can use Multus for additional networks</li>
+                    <li><strong>Snapshots & Cloning:</strong> VM snapshots and rapid cloning</li>
+                    <li><strong>Windows Support:</strong> Run Windows VMs with VirtIO drivers</li>
+                </ul>
+            </div>
+
+            <div class="info-box">
+                <h4>Architecture Components:</h4>
+                <ul>
+                    <li><strong>KubeVirt:</strong> Core virtualization engine</li>
+                    <li><strong>virt-operator:</strong> Manages KubeVirt deployment</li>
+                    <li><strong>virt-api:</strong> API server for virtualization resources</li>
+                    <li><strong>virt-controller:</strong> Orchestrates VM lifecycle</li>
+                    <li><strong>virt-handler:</strong> DaemonSet running on each node, manages VMs on that node</li>
+                    <li><strong>virt-launcher:</strong> Pod wrapper that runs the VM process</li>
+                    <li><strong>libvirt/QEMU:</strong> Underlying virtualization technology</li>
+                </ul>
+            </div>
+
+            <div class="info-box">
+                <h4>Key Resources:</h4>
+                <ul>
+                    <li><strong>VirtualMachine (VM):</strong> Defines the desired state of a VM (like Deployment for pods)</li>
+                    <li><strong>VirtualMachineInstance (VMI):</strong> Running instance of a VM (like Pod)</li>
+                    <li><strong>DataVolume:</strong> Provisions and populates PVCs for VM disks using CDI</li>
+                    <li><strong>VirtualMachineInstanceReplicaSet:</strong> Manages multiple VM instances</li>
+                    <li><strong>VirtualMachineSnapshot:</strong> Point-in-time snapshot of VM</li>
+                </ul>
+            </div>
+
+            <div class="info-box">
+                <h4>Networking for VMs:</h4>
+                <ul>
+                    <li><strong>Pod Network (default):</strong> VM connects to OpenShift SDN like a pod</li>
+                    <li><strong>Multus Networks:</strong> Attach additional networks to VM for:</li>
+                    <ul style="margin-left: 2rem;">
+                        <li>Direct access from external network</li>
+                        <li>VLAN tagged networks</li>
+                        <li>SR-IOV for high performance</li>
+                        <li>Bridged networking to physical NICs</li>
+                    </ul>
+                    <li><strong>Why Multus is Critical:</strong> VMs often need direct network access that pod networking doesn't provide</li>
+                </ul>
+            </div>
+
+            <div class="info-box">
+                <h4>Storage for VMs:</h4>
+                <ul>
+                    <li><strong>Containerized Disks:</strong> VM disk images in container images</li>
+                    <li><strong>PersistentVolumeClaims:</strong> Persistent storage for VM disks</li>
+                    <li><strong>DataVolumes with CDI:</strong> Containerized Data Importer populates PVCs from:</li>
+                    <ul style="margin-left: 2rem;">
+                        <li>HTTP/HTTPS URLs (qcow2, raw, vmdk images)</li>
+                        <li>Container registries</li>
+                        <li>Existing PVCs (cloning)</li>
+                        <li>Blank disk images</li>
+                    </ul>
+                    <li><strong>Storage Classes:</strong> Use fast storage (SSD) for performance-critical VMs</li>
+                </ul>
+            </div>
+
+            <div class="info-box">
+                <h4>VM Lifecycle:</h4>
+                <ul>
+                    <li><strong>Stopped:</strong> VM defined but not running (no VMI exists)</li>
+                    <li><strong>Starting:</strong> VM is booting</li>
+                    <li><strong>Running:</strong> VM is running (VMI exists)</li>
+                    <li><strong>Paused:</strong> VM paused in memory</li>
+                    <li><strong>Migrating:</strong> VM being live migrated to another node</li>
+                    <li><strong>Stopping:</strong> VM shutting down gracefully</li>
+                </ul>
+            </div>
+
+            <div class="info-box">
+                <h4>Use Cases:</h4>
+                <ul>
+                    <li><strong>VM Modernization:</strong> Gradually move from VMs to containers</li>
+                    <li><strong>Legacy Applications:</strong> Run apps that can't be containerized</li>
+                    <li><strong>Windows Workloads:</strong> Run Windows VMs alongside Linux containers</li>
+                    <li><strong>Hypershift/HCP:</strong> Run hosted control planes as VMs</li>
+                    <li><strong>Development/Test:</strong> Quick VM provisioning for testing</li>
+                </ul>
+            </div>
+
+            <div class="info-box">
+                <h4>virtctl CLI:</h4>
+                <p>Dedicated CLI for VM operations (in addition to oc/kubectl):</p>
+                <ul>
+                    <li>Start/stop/restart VMs</li>
+                    <li>Connect to VM console (VNC/serial)</li>
+                    <li>SSH to VMs</li>
+                    <li>Expose VMs as services</li>
+                    <li>Upload disk images</li>
+                    <li>Trigger live migration</li>
+                    <li>Pause/unpause VMs</li>
+                </ul>
+            </div>
+        </section>
+
+        <footer class="footer">
+            <p>&copy; 2026 OpenShift Learning Hub. All Rights Reserved.</p>
+            <p>Created as a personal project for learning and understanding OpenShift concepts.</p>
+        </footer>
+
+        <!-- <footer class="footer">
+            <p>OpenShift Learning Hub - Master OpenShift Concepts</p>
+            <p>Images and content can be updated via config.js</p>
+            <p style="margin-top: 1rem; font-size: 0.9rem;">
+                <strong>Image Paths (Update in config.js or directly in HTML):</strong><br>
+                OC Command: images/oc-command-flow.png<br>
+                HCP Architecture: images/hcp-architecture.png<br>
+                Hub Cluster: images/hub-cluster-operators.png<br>
+                Virtualization: images/virtualization-architecture.png<br>
+                Networking: images/networking-flow.png
+            </p>
+        </footer> -->
+    </main>
+
+    <button id="backToTop" class="back-to-top" title="Back to top">HCP Architecture: images/hcp-architecture.png
+
+        <i class="fas fa-arrow-up"></i>
+    </button>
+
+    <script src="config.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
